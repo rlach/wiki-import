@@ -10,5 +10,12 @@
     "wiki-import.import": "Importuj",
     "wiki-import.fetchError": "Błąd przy pobieraniu strony. Prawdopodobnie problem z CORSem.",
     "wiki-import.settings.infoboxes.name": "Dodatkowe infoboxy",
-    "wiki-import.settings.infoboxes.hint": "Podaj wszystkie dodatkowe infoboxy, które chcesz wspierać rozdzielone przy pomocy `;`."
+    "wiki-import.settings.infoboxes.hint": "Podaj wszystkie dodatkowe infoboxy, które chcesz wspierać rozdzielone przy pomocy `;`.",
+    "wiki-import.progress.startFetch": "Pobieranie strony...",
+    "wiki-import.progress.startConvert": "Importowanie strony...",
+    "wiki-import.progress.complete": "Strona zaimportowana!",
+    "wiki-import.quickInstert.reindexStart`": "Indeksowanie kompendiów...",
+    "wiki-import.quickInstert.reindexComplete`": "Kompendia zaindeksowane.",
+    "wiki-import.settings.downloadImages.name": "Pobieraj obrazy",
+    "wiki-import.settings.downloadImages.hint": "Po włączeniu obrazy będą pobierane do lokalnego folderu. W wypadku porażki, np. z powodu CORSów, zachowa się jakby ta opcja była wyłączona."
 }

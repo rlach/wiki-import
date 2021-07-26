@@ -1,7 +1,5 @@
 import wtf from "./lib/wtf_wikipedia-client.mjs";
 
-const DOWNLOAD_IMAGES = false;
-
 export class WikiImporter {
   static ID = "wiki-import";
 
@@ -21,7 +19,8 @@ export class WikiImporter {
   };
 
   static SETTINGS = {
-    INFOBOXES: "infoboxes"
+    INFOBOXES: "infoboxes",
+    DOWNLOAD_IMAGES: "downloadImages"
   };
 
   static indexingPromise = null;
@@ -161,21 +160,34 @@ async function docToJournal(doc) {
     result += "</div>";
   }
 
+  const downloadImages = game.settings.get(
+    WikiImporter.ID,
+    WikiImporter.SETTINGS.INFOBOXES
+  );
+
   for (const image of doc.images()) {
-    if (DOWNLOAD_IMAGES) {
-      await downloadImage(image);
+    console.log("wiki-import", image);
+    let resultPath = null;
+    if (downloadImages) {
+      resultPath = await downloadImage(image);
+    }
+
+    if (!resultPath || !downloadImages) {
       result = result.replace(
         image.data.file,
-        getImageString(image, "wiki_import/" + image.data.file)
+        getImageString(image, image.url(), image.file())
       );
     } else {
       result = result.replace(
         image.data.file,
-        getImageString(image, image.url())
+        getImageString(image, resultPath)
       );
     }
   }
 
+  ui.notifications.info(
+    game.i18n.localize(`${WikiImporter.ID}.progress.complete`)
+  );
   return result;
 }
 
@@ -199,25 +211,58 @@ function addCustomInfoBoxes() {
   }
 }
 
-async function downloadImage(image) {
-  // TODO: download images
-  // if (!fs.existsSync('wiki_import/' + image.data.file)) {
-  //     const response = await fetch(image.url());
-  //     const blob = await response.blob()
-  //     const buffer = Buffer.from(await blob.arrayBuffer());
-  //     fs.writeFileSync('wiki_import/' + image.data.file, buffer);
-  // }
+export async function downloadImage(image) {
+  if (
+    !(await FilePicker.browse("data", `wiki-import`)).dirs.find(
+      d => d === `wiki-import/${image.data.domain}`
+    )
+  ) {
+    await FilePicker.createDirectory(
+      "data",
+      `wiki-import/${image.data.domain}`
+    );
+  }
+
+  if (
+    !(await FilePicker.browse(
+      "data",
+      `wiki-import/${image.data.domain}`
+    )).files.find(f => f === image.file())
+  ) {
+    try {
+      const response = await fetch(image.url());
+
+      await FilePicker.upload(
+        "data",
+        `wiki-import/${image.data.domain}`,
+        new File([await response.blob()], image.file())
+      );
+    } catch (e) {
+      WikiImporter.log(false, `Could not download image ${image.url()}`, e);
+      return;
+    }
+  }
+
+  return `wiki-import/${image.data.domain}/${image.file()}`;
 }
 
 async function addImages(images) {
   let result = '<div style="margin-left: auto; margin-right: 0;">';
-  WikiImporter.log(true, images);
+  const downloadImages = game.settings.get(
+    WikiImporter.ID,
+    WikiImporter.SETTINGS.DOWNLOAD_IMAGES
+  );
+
   for (const image of images) {
-    if (DOWNLOAD_IMAGES) {
-      await downloadImage(image);
-      result += getImageString(image, "wiki_import/" + image.data.file);
-    } else {
+    let resultPath = null;
+    if (downloadImages) {
+      resultPath = await downloadImage(image);
+    }
+
+    if (!resultPath || !downloadImages) {
       result += getImageString(image, image.url());
+    } else {
+      result += getImageString(image, resultPath);
     }
   }
   result += "</div>";

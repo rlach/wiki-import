@@ -1,21 +1,38 @@
 import { WikiImporter } from "./WikiImporter.js";
 
-Hooks.once("init", () => {
+Hooks.once("init", async () => {
+  if ((await FilePicker.browse("data", "wiki-import").target) === "") {
+    await FilePicker.createDirectory("data", "wiki-import");
+  }
+
   game.settings.register(WikiImporter.ID, WikiImporter.SETTINGS.INFOBOXES, {
     name: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.INFOBOXES}.name`,
-    default: '',
+    default: "",
     type: String,
-    scope: 'client',
+    scope: "client",
     config: true,
-    hint: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.INFOBOXES}.hint`,
+    hint: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.INFOBOXES}.hint`
   });
-})
+
+  game.settings.register(
+    WikiImporter.ID,
+    WikiImporter.SETTINGS.DOWNLOAD_IMAGES,
+    {
+      name: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.DOWNLOAD_IMAGES}.name`,
+      default: false,
+      type: Boolean,
+      scope: "client",
+      config: true,
+      hint: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.DOWNLOAD_IMAGES}.hint`
+    }
+  );
+});
 
 Hooks.once("devModeReady", ({ registerPackageDebugFlag }) => {
   registerPackageDebugFlag(WikiImporter.ID);
 });
 
-Hooks.on("ready", async function () {
+Hooks.on("ready", async function() {
   WikiImporter.log(true, "Wiki importer active!");
 });
 
@@ -23,9 +40,10 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
   if (game.user.isGM) {
     let title = game.i18n.localize(`${WikiImporter.ID}.buttonTitle`);
     let label = game.i18n.localize(`${WikiImporter.ID}.buttonLabel`);
-    let previousDomain = app.entity.getFlag(WikiImporter.ID, WikiImporter.FLAGS.DOMAIN) || '';
+    let previousDomain =
+      app.entity.getFlag(WikiImporter.ID, WikiImporter.FLAGS.DOMAIN) || "";
     let downloadFromUrlLabel = game.i18n.localize(
-        `${WikiImporter.ID}.dialog.downloadFromUrl`
+      `${WikiImporter.ID}.dialog.downloadFromUrl`
     );
     let wikiArticleUrlLabel = game.i18n.localize(
       `${WikiImporter.ID}.dialog.wikiArticleUrl`
@@ -43,7 +61,7 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
     let openBtn = $(
       `<a class="open-gm-note" title="${title}"><i class="fas fa-file-import"></i>${label}</a>`
     );
-    openBtn.click((ev) => {
+    openBtn.click(ev => {
       new Dialog({
         title: game.i18n.localize(`${WikiImporter.ID}.dialogTitle`),
         content: `
@@ -68,7 +86,7 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
           yes: {
             icon: "<i class='fas fa-check'></i>",
             label: game.i18n.localize(`${WikiImporter.ID}.import`),
-            callback: async (html) => {
+            callback: async html => {
               let articleUrl = html.find("input[name='articleUrl']").val();
               let wikiSource = html.find("textarea[name='wikiSource']").val();
               let domain = html.find("input[name='wikiDomain']").val();
@@ -84,17 +102,24 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
                 }
               } else {
                 content = await WikiImporter.convertSource(wikiSource, domain);
-                app.entity.setFlag(WikiImporter.ID, WikiImporter.FLAGS.DOMAIN, domain);
+                app.entity.setFlag(
+                  WikiImporter.ID,
+                  WikiImporter.FLAGS.DOMAIN,
+                  domain
+                );
               }
 
               app.document.update({ content });
-            },
-          },
+            }
+          }
         },
-        default: "yes",
+        default: "yes"
       }).render(true);
     });
-    html.closest(".app").find(".open-gm-note").remove();
+    html
+      .closest(".app")
+      .find(".open-gm-note")
+      .remove();
     let titleElement = html.closest(".app").find(".window-title");
     openBtn.insertAfter(titleElement);
   }

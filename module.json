@@ -14,10 +14,7 @@
     }
   ],
   "dependencies": [
-    {
-      "name": "quick-insert",
-      "manifest": "https://gitlab.com/fvtt-modules-lab/quick-insert/-/jobs/artifacts/v2.4.7/raw/module.json?job=build-module"
-    }
+
   ],
   "conflicts": [
     

@@ -13,6 +13,9 @@
     "wiki-import.settings.infoboxes.hint": "List all additional infobox template names you want to parse delimited by `;` character.",
     "wiki-import.progress.startFetch": "Downloading wikipedia page...",
     "wiki-import.progress.startConvert": "Importing wikipedia page...",
+    "wiki-import.progress.complete": "Wiki page imported!",
     "wiki-import.quickInstert.reindexStart`": "Indexing compendia...",
-    "wiki-import.quickInstert.reindexComplete`": "Indexed compendia."
+    "wiki-import.quickInstert.reindexComplete`": "Indexed compendia.",
+    "wiki-import.settings.downloadImages.name": "Download images",
+    "wiki-import.settings.downloadImages.hint": "If set to true will attempt to download images to local directory. Will fallback to regular behavior if behind CORS or any other issue happens."
 }
