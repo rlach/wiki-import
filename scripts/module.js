@@ -12,7 +12,7 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
   if (game.user.isGM) {
     let title = game.i18n.localize(`${WikiImporter.ID}.buttonTitle`);
     let label = game.i18n.localize(`${WikiImporter.ID}.buttonLabel`);
-    let previousDomain = app.entity.getFlag(WikiImporter.ID, "domain");
+    let previousDomain = app.entity.getFlag(WikiImporter.ID, "domain") || '';
     let wikiArticleUrlLabel = game.i18n.localize(
       `${WikiImporter.ID}.dialog.wikiArticleUrl`
     );
