@@ -1,0 +1,11 @@
+{
+    "wiki-import.buttonTitle": "Importer z wikipedii",
+    "wiki-import.buttonLabel": "Wiki",
+    "wiki-import.dialogTitle": "Import z wikipedii",
+    "wiki-import.dialog.wikiArticleUrl": "Url artykułu wiki:",
+    "wiki-import.dialog.pasteSource": "LUB wklej źródło:",
+    "wiki-import.dialog.wikiSource": "Źródło:",
+    "wiki-import.dialog.wikiDomain": "Domena wiki(domyślnie: wikipedia.org):",
+    "wiki-import.import": "Importuj",
+    "wiki-import.fetchError": "Błąd przy pobieraniu strony. Prawdopodobnie problem z CORSem."
+}

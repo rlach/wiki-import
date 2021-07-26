@@ -1,17 +1,16 @@
 {
-  "name": "module",
-  "title": "New Module",
-  "description": "",
+  "name": "wiki-import",
+  "title": "Wiki to journal importer",
+  "description": "A simple module which allows users to import wiki articles into Foundry Journal Entries.",
   "version": "This is auto replaced",
   "library": "false",
   "manifestPlusVersion": "1.0.0",
-  "minimumCoreVersion": "0.8.8",
+  "minimumCoreVersion": "0.8.0",
   "compatibleCoreVersion": "0.8.8",
   "authors": [
     {
-      "name": "The League of Extraordinary FVTT Developers",
-      "url": "https://github.com/League-of-Foundry-Developers",
-      "discord": "discordID#0001"
+      "name": "Areinu",
+      "url": "https://github.com/rlach"
     }
   ],
   "dependencies": [
@@ -34,6 +33,11 @@
       "lang": "en",
       "name": "English",
       "path": "languages/en.json"
+    },
+    {
+      "lang": "pl",
+      "name": "Polish",
+      "path": "languages/pl.json"
     }
   ],
   "url": "This is auto replaced",
