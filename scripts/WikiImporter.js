@@ -327,7 +327,10 @@ function addSentence(sentence) {
         )
       );
     } else if (link.type() === "external") {
-      sentenceText = sentenceText.replace(link.text(), `<a href="${link.site()}">${link.text()}</a>`)
+      sentenceText = sentenceText.replace(
+        link.text(),
+        `<a href="${link.site()}">${link.text()}</a>`
+      );
     }
   }
   return sentenceText;
@@ -339,11 +342,15 @@ function getLink(linkPage, searchResults, linkText) {
     if (!result) {
       result = searchResults.find(s => s.item.entityType === "JournalEntry");
     }
-    if(!result) {
+    if (!result) {
       result = searchResults[0];
     }
     if (result) {
-      return `@Compendium[${result.item.package}.${result.item.id}]{${linkText}}`;
+      if (result.item.package) {
+        return `@Compendium[${result.item.package}.${result.item.id}]{${linkText}}`;
+      } else {
+        return `@JournalEntry[${result.item.id}]{${linkText}}`;
+      }
     }
   }
 
