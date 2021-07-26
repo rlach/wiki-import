@@ -1,5 +1,16 @@
 import { WikiImporter } from "./WikiImporter.js";
 
+Hooks.once("init", () => {
+  game.settings.register(WikiImporter.ID, WikiImporter.SETTINGS.INFOBOXES, {
+    name: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.INFOBOXES}.name`,
+    default: '',
+    type: String,
+    scope: 'client',
+    config: true,
+    hint: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.INFOBOXES}.hint`,
+  });
+})
+
 Hooks.once("devModeReady", ({ registerPackageDebugFlag }) => {
   registerPackageDebugFlag(WikiImporter.ID);
 });
@@ -12,7 +23,10 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
   if (game.user.isGM) {
     let title = game.i18n.localize(`${WikiImporter.ID}.buttonTitle`);
     let label = game.i18n.localize(`${WikiImporter.ID}.buttonLabel`);
-    let previousDomain = app.entity.getFlag(WikiImporter.ID, "domain") || '';
+    let previousDomain = app.entity.getFlag(WikiImporter.ID, WikiImporter.FLAGS.DOMAIN) || '';
+    let downloadFromUrlLabel = game.i18n.localize(
+        `${WikiImporter.ID}.dialog.downloadFromUrl`
+    );
     let wikiArticleUrlLabel = game.i18n.localize(
       `${WikiImporter.ID}.dialog.wikiArticleUrl`
     );
@@ -35,7 +49,7 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
         content: `
     <form>
     
-    <p>Download article from url:</p>
+    <p>${downloadFromUrlLabel}</p>
       <div class="form-group">
         <label>${wikiArticleUrlLabel}</label>
         <input type='text' name='articleUrl'></input>
@@ -70,7 +84,7 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
                 }
               } else {
                 content = await WikiImporter.convertSource(wikiSource, domain);
-                app.entity.setFlag(WikiImporter.ID, "domain", domain);
+                app.entity.setFlag(WikiImporter.ID, WikiImporter.FLAGS.DOMAIN, domain);
               }
 
               app.document.update({ content });

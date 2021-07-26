@@ -17,16 +17,31 @@ export class WikiImporter {
 
   static FLAGS = {
     WIKI_IMPORT: "wiki-import",
+    DOMAIN: "domain"
   };
 
+  static SETTINGS = {
+    INFOBOXES: "infoboxes"
+  };
+
+  static indexingPromise = null;
+
   static async fetchPage(url) {
+    ui.notifications.info(
+      game.i18n.localize(`${WikiImporter.ID}.progress.startFetch`)
+    );
+    addCustomInfoBoxes();
     const doc = await wtf.fetch(url);
     return docToJournal(doc);
   }
 
   static async convertSource(source, domain) {
+    ui.notifications.info(
+      game.i18n.localize(`${WikiImporter.ID}.progress.startConvert`)
+    );
+    addCustomInfoBoxes();
     const doc = wtf(source, {
-      domain: domain || "wikipedia.org",
+      domain: domain || "wikipedia.org"
     });
     return docToJournal(doc);
   }
@@ -70,7 +85,7 @@ wtf.extend((models, templates, infoboxes) => {
     vehicle: true,
 
     //Wikipedia
-    instrument: true,
+    instrument: true
   });
 });
 
@@ -109,6 +124,22 @@ function addParagraphsAndTables(orderedItems) {
 }
 
 async function docToJournal(doc) {
+  if (QuickInsert && !(QuickInsert.hasIndex ?? QuickInsert.searchLib?.index)) {
+    if (!WikiImporter.indexingPromise) {
+      ui.notifications.info(
+        game.i18n.localize(`${WikiImporter.ID}.quickInstert.reindexStart`)
+      );
+      WikiImporter.indexingPromise = QuickInsert.forceIndex();
+      await WikiImporter.indexingPromise;
+      delete WikiImporter.indexingPromise;
+      ui.notifications.info(
+        game.i18n.localize(`${WikiImporter.ID}.quickInstert.reindexComplete`)
+      );
+    } else {
+      await WikiImporter.indexingPromise;
+    }
+  }
+
   let result = "";
   for (const section of doc.sections()) {
     if (
@@ -148,6 +179,26 @@ async function docToJournal(doc) {
   return result;
 }
 
+function addCustomInfoBoxes() {
+  let customInfoBoxes = game.settings.get(
+    WikiImporter.ID,
+    WikiImporter.SETTINGS.INFOBOXES
+  );
+  if (customInfoBoxes) {
+    let splitBoxes = customInfoBoxes
+      .toLowerCase()
+      .split(";")
+      .filter(infobox => infobox.length > 0);
+    let newBoxes = {};
+    for (const splitBox of splitBoxes) {
+      newBoxes[splitBox] = true;
+    }
+    wtf.extend((models, templates, infoboxes) => {
+      Object.assign(infoboxes, newBoxes);
+    });
+  }
+}
+
 async function downloadImage(image) {
   // TODO: download images
   // if (!fs.existsSync('wiki_import/' + image.data.file)) {
@@ -160,6 +211,7 @@ async function downloadImage(image) {
 
 async function addImages(images) {
   let result = '<div style="margin-left: auto; margin-right: 0;">';
+  WikiImporter.log(true, images);
   for (const image of images) {
     if (DOWNLOAD_IMAGES) {
       await downloadImage(image);
@@ -237,14 +289,6 @@ function addLists(lists) {
   return result;
 }
 
-function addText(paragraphs) {
-  let result = "";
-  for (const paragraph of paragraphs) {
-    result += addParagraph(paragraph);
-  }
-  return result;
-}
-
 function addParagraph(paragraph) {
   let paragraphText = "";
   for (const sentence of paragraph.sentences()) {
@@ -267,24 +311,43 @@ function addSentence(sentence) {
   }
   for (const link of sentence.links()) {
     if (link.type() === "internal") {
-      //TODO: pf2e journal links, maybe smarter, by lookup?
-      //TODO: links by id if possible?
-      if (link.text()) {
-        sentenceText = sentenceText.replace(
-          link.text(),
-          `@JournalEntry[${link.page()}]{${link.text()}}`
-        );
-      } else {
-        sentenceText = sentenceText.replace(
-          link.page(),
-          `@JournalEntry[${link.page()}]`
+      let searchResults = [];
+      if (QuickInsert && QuickInsert.search) {
+        searchResults = QuickInsert.search(link.page()).filter(
+          result => result.item.name.toLowerCase() === link.page()
         );
       }
-    } else {
-      //TODO: external links
+
+      sentenceText = sentenceText.replace(
+        link.page(),
+        getLink(
+          link.page(),
+          searchResults,
+          link.text() ? link.text() : link.page()
+        )
+      );
+    } else if (link.type() === "external") {
+      sentenceText = sentenceText.replace(link.text(), `<a href="${link.site()}">${link.text()}</a>`)
     }
   }
   return sentenceText;
+}
+
+function getLink(linkPage, searchResults, linkText) {
+  if (searchResults.length > 0) {
+    let result = searchResults.find(s => s.item.entityType === "Item");
+    if (!result) {
+      result = searchResults.find(s => s.item.entityType === "JournalEntry");
+    }
+    if(!result) {
+      result = searchResults[0];
+    }
+    if (result) {
+      return `@Compendium[${result.item.package}.${result.item.id}]{${linkText}}`;
+    }
+  }
+
+  return `@JournalEntry[${linkPage}]${linkText}`;
 }
 
 function header(title, depth) {

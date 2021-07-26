@@ -2,10 +2,17 @@
     "wiki-import.buttonTitle": "Wikipedia importer",
     "wiki-import.buttonLabel": "Wiki",
     "wiki-import.dialogTitle": "Wikipedia import",
+    "wiki-import.dialog.downloadFromUrl": "Download article from url:",
     "wiki-import.dialog.wikiArticleUrl": "Wiki article url:",
     "wiki-import.dialog.pasteSource": "OR paste the source:",
     "wiki-import.dialog.wikiSource": "Wiki source:",
     "wiki-import.dialog.wikiDomain": "Wiki domain(default: wikipedia.org):",
     "wiki-import.import": "Import",
-    "wiki-import.fetchError": "Error while downloading requested page. Possibly due to CORS issue."
+    "wiki-import.fetchError": "Error while downloading requested page. Possibly due to CORS issue.",
+    "wiki-import.settings.infoboxes.name": "Additional infoboxes",
+    "wiki-import.settings.infoboxes.hint": "List all additional infobox template names you want to parse delimited by `;` character.",
+    "wiki-import.progress.startFetch": "Downloading wikipedia page...",
+    "wiki-import.progress.startConvert": "Importing wikipedia page...",
+    "wiki-import.quickInstert.reindexStart`": "Indexing compendia...",
+    "wiki-import.quickInstert.reindexComplete`": "Indexed compendia."
 }

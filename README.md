@@ -7,7 +7,7 @@
 <!--- replace <your-module-name> with the `name` in your manifest -->
 <!--- ![Forge Installs](https://img.shields.io/badge/dynamic/json?label=Forge%20Installs&query=package.installs&suffix=%25&url=https%3A%2F%2Fforge-vtt.com%2Fapi%2Fbazaar%2Fpackage%2Fwiki-import&colorB=4aa94a) -->
 
-# FoundryVTT Module
+# FoundryVTT Wikipedia to Journal importer
 
 Imports wikipedia articles as journal entries in Foundry VTT. 
 
@@ -19,7 +19,10 @@ Infoboxes won't use templates from wikipedia, instead they will be represented a
 
 ## How to use
 
-There are two ways to import the conent:
+Open journal entry you want to import wikipedia to, on top of the window you'll find `Wiki` button.
+Click it, and you'll see dialog window with import settings.
+
+There are two ways to import the content:
 
 * Enter the full url of the page you want to import (including https)
   - If url is filled in all other fields are ignored.
@@ -30,10 +33,53 @@ There are two ways to import the conent:
   - You should use this option if importing by URL doesn't work. Usually it's caused by CORS issues.
   - The domain name is needed to properly import images from target URL.
 
+## Adding custom info boxes
+
+Wikipedias around the world have thousands of info box templates they use. It's impossible to be able to detect and parse them all.
+
+If you run into box that is not recognized you can add it in settings, delimited by `;` character.
+
+For example https://www.dandwiki.com/w/index.php?title=5e_SRD:Produce_Flame has this infobox:
+
+```
+{{5e SRD Spell
+|name=Produce Flame
+|school=Conjuration
+|lvl=cantrip
+|casttime=1 action
+|range=Self
+|comp=V, S
+|dur=10 minutes
+|summary=The flame sheds {{5e|Bright Light|bright light}} in a 10-foot radius and {{5e|Dim Light|dim light}} for an additional 10 feet.
+}}
+```
+
+And https://forgottenrealms.fandom.com/wiki/Zakhara has this:
+```
+{{Location
+| type            = Continent
+```
+
+To support them in `Settings->Wiki to journal importer->Additional infoboxes` add:
+```
+Location;5e SRD Spell
+```
+It's case insensitive.
+
 ## Limitations
 
 This module uses [wtf_wikipedia](https://github.com/spencermountain/wtf_wikipedia) to parse the articles, so it has most of the limitations described on their repository. This means the articles won't be imported 100% accurate, but it will still be pretty close. Requiring very little(if any) manual fixes afterwards.
 
+In addition: 
+
+Image resolution might work or not depending on how given wiki stores the data. For example `fandom.org` wikis won't work. If the images is just plain link instead of File syntax it will not work.
+
+References are not imported(those pesky numbers in square brackets that refer to original sources).
+
 ## Changelog
+
+### 0.0.2
+* Add setting to add custom infoboxes.
+
 ### 0.0.1
 * Initial, basic functionality. Import the wiki article with images linked to the original site.
