@@ -78,6 +78,11 @@ References are not imported(those pesky numbers in square brackets that refer to
 
 ## Changelog
 
+### 0.9.0
+* Images will be downloaded locally if set in settings
+* Support for external links
+* Generate links to Compendia and existing local journal entries
+
 ### 0.0.2
 * Add setting to add custom infoboxes.
 
