@@ -166,7 +166,6 @@ async function docToJournal(doc) {
   );
 
   for (const image of doc.images()) {
-    console.log("wiki-import", image);
     let resultPath = null;
     if (downloadImages) {
       resultPath = await downloadImage(image);
@@ -359,12 +358,12 @@ function addSentence(sentence) {
       let searchResults = [];
       if (QuickInsert && QuickInsert.search) {
         searchResults = QuickInsert.search(link.page()).filter(
-          result => result.item.name.toLowerCase() === link.page()
+          result => result.item.name.toLowerCase() === link.page().toLowerCase()
         );
       }
 
       sentenceText = sentenceText.replace(
-        link.page(),
+        link.text() ? link.text() : link.page(),
         getLink(
           link.page(),
           searchResults,
@@ -399,7 +398,7 @@ function getLink(linkPage, searchResults, linkText) {
     }
   }
 
-  return `@JournalEntry[${linkPage}]${linkText}`;
+  return `@JournalEntry[${linkPage}]{${linkText}}`;
 }
 
 function header(title, depth) {
