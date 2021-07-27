@@ -392,14 +392,19 @@ async function searchLink(link) {
   };
 }
 
+function escapeRegExp(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
 function addLink(link, searchResults, sentenceText) {
   if (link.type() === "internal") {
+    const linkText = link.text() ? link.text() : link.page();
     return sentenceText.replace(
-      link.text() ? link.text() : link.page(),
+      new RegExp(escapeRegExp(linkText) + '(?![^{]*})'),
       getLink(
         link.page(),
         searchResults,
-        link.text() ? link.text() : link.page()
+        linkText
       )
     );
   } else if (link.type() === "external") {

@@ -101,6 +101,7 @@ References are not imported(those pesky numbers in square brackets that refer to
 
 ### 0.9.2
 * Improved memorization of last domain used.
+* Fixed a bug with links when the same link text is used multiple times in single sentence.
 
 ### 0.9.1
 * Fixed bugs, improved UX with quick insert a bit.
