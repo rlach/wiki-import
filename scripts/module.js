@@ -56,7 +56,8 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
     let title = game.i18n.localize(`${WikiImporter.ID}.buttonTitle`);
     let label = game.i18n.localize(`${WikiImporter.ID}.buttonLabel`);
     let previousDomain =
-      app.entity.getFlag(WikiImporter.ID, WikiImporter.FLAGS.DOMAIN) || "";
+        game.user.getFlag(WikiImporter.ID, WikiImporter.FLAGS.DOMAIN) || "";
+    WikiImporter.log(false, 'previous domain', previousDomain);
     let downloadFromUrlLabel = game.i18n.localize(
       `${WikiImporter.ID}.dialog.downloadFromUrl`
     );
@@ -105,6 +106,7 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
               let articleUrl = html.find("input[name='articleUrl']").val();
               let wikiSource = html.find("textarea[name='wikiSource']").val();
               let domain = html.find("input[name='wikiDomain']").val();
+              WikiImporter.log(false, 'found domain', domain);
 
               setTimeout(async () => {
                 let content = "";
@@ -119,7 +121,7 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
                   }
                 } else {
                   content = await WikiImporter.convertSource(wikiSource, domain);
-                  app.entity.setFlag(
+                  game.user.setFlag(
                       WikiImporter.ID,
                       WikiImporter.FLAGS.DOMAIN,
                       domain

@@ -99,6 +99,9 @@ References are not imported(those pesky numbers in square brackets that refer to
 
 ## Changelog
 
+### 0.9.2
+* Improved memorization of last domain used.
+
 ### 0.9.1
 * Fixed bugs, improved UX with quick insert a bit.
 
