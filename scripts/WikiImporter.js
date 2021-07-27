@@ -376,7 +376,7 @@ async function addSentence(sentence) {
 async function searchLink(link) {
   let searchResults = [];
 
-  if (self.QuickInsert && QuickInsert.search) {
+  if (link.type() === "internal" && self.QuickInsert && QuickInsert.search) {
     if (
       game.settings.get(WikiImporter.ID, WikiImporter.SETTINGS.USE_QUICK_INSERT)
     ) {
