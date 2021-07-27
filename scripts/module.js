@@ -26,6 +26,21 @@ Hooks.once("init", async () => {
       hint: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.DOWNLOAD_IMAGES}.hint`
     }
   );
+
+  if(QuickInsert) {
+    game.settings.register(
+        WikiImporter.ID,
+        WikiImporter.SETTINGS.USE_QUICK_INSERT,
+        {
+          name: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.USE_QUICK_INSERT}.name`,
+          default: true,
+          type: Boolean,
+          scope: "client",
+          config: true,
+          hint: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.USE_QUICK_INSERT}.hint`
+        }
+    );
+  }
 });
 
 Hooks.once("devModeReady", ({ registerPackageDebugFlag }) => {
@@ -90,26 +105,30 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
               let articleUrl = html.find("input[name='articleUrl']").val();
               let wikiSource = html.find("textarea[name='wikiSource']").val();
               let domain = html.find("input[name='wikiDomain']").val();
-              let content = "";
-              if (articleUrl !== "") {
-                try {
-                  content = await WikiImporter.fetchPage(articleUrl);
-                } catch (err) {
-                  WikiImporter.log(false, err);
-                  ui.notifications.error(
-                    game.i18n.localize(`${WikiImporter.ID}.fetchError`)
+
+              setTimeout(async () => {
+                let content = "";
+                if (articleUrl !== "") {
+                  try {
+                    content = await WikiImporter.fetchPage(articleUrl);
+                  } catch (err) {
+                    WikiImporter.log(false, err);
+                    ui.notifications.error(
+                        game.i18n.localize(`${WikiImporter.ID}.fetchError`)
+                    );
+                  }
+                } else {
+                  content = await WikiImporter.convertSource(wikiSource, domain);
+                  app.entity.setFlag(
+                      WikiImporter.ID,
+                      WikiImporter.FLAGS.DOMAIN,
+                      domain
                   );
                 }
-              } else {
-                content = await WikiImporter.convertSource(wikiSource, domain);
-                app.entity.setFlag(
-                  WikiImporter.ID,
-                  WikiImporter.FLAGS.DOMAIN,
-                  domain
-                );
-              }
 
-              app.document.update({ content });
+                console.log('wiki-test', 'update-content');
+                app.document.update({ content });
+              })
             }
           }
         },

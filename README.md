@@ -33,6 +33,16 @@ There are two ways to import the content:
   - You should use this option if importing by URL doesn't work. Usually it's caused by CORS issues.
   - The domain name is needed to properly import images from target URL.
 
+## Quick Insert module support
+
+If you have [Quick Insert](https://gitlab.com/fvtt-modules-lab/quick-insert) module installed the importer will try to link wikipedia links to your compedia during import.
+This is rather slow currently, but will often link deities, ancestries(or races), classes, backgrounds etc. that appear in your documents to proper compedias.
+
+Sometimes it might link not 100% accurate, for example `herbalist` can be both archetype and background in Pathfinder 2e, so it's not possible to know which you wanted to have linked.
+The linker will prioritize `Item` entries, then `JournalEntry` entries, and all others, like `Actor` entries will be used last.
+
+If you don't want to use this feature you can disable it in setting that appears only when Quick Insert is installed.
+
 ## Adding custom info boxes
 
 Wikipedias around the world have thousands of info box templates they use. It's impossible to be able to detect and parse them all.
@@ -66,6 +76,12 @@ Location;5e SRD Spell
 ```
 It's case insensitive.
 
+## Image downloading
+
+You can enable image downloading, but it will work pretty much only with wikis you own and have CORS properly configured for your foundry installation.
+
+If enabled the images will be downloaded to your user `data/wiki-import/wikipedia.domain/` folder. In case download fails for any reason it will be linked normally.
+
 ## Limitations
 
 This module uses [wtf_wikipedia](https://github.com/spencermountain/wtf_wikipedia) to parse the articles, so it has most of the limitations described on their repository. This means the articles won't be imported 100% accurate, but it will still be pretty close. Requiring very little(if any) manual fixes afterwards.
@@ -77,6 +93,9 @@ Image resolution might work or not depending on how given wiki stores the data. 
 References are not imported(those pesky numbers in square brackets that refer to original sources).
 
 ## Changelog
+
+### 0.9.1
+* Fixed bugs, improved UX with quick insert a bit.
 
 ### 0.9.0
 * Images will be downloaded locally if set in settings

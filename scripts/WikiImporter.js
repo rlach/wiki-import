@@ -20,7 +20,8 @@ export class WikiImporter {
 
   static SETTINGS = {
     INFOBOXES: "infoboxes",
-    DOWNLOAD_IMAGES: "downloadImages"
+    DOWNLOAD_IMAGES: "downloadImages",
+    USE_QUICK_INSERT: "useQuickInsert"
   };
 
   static indexingPromise = null;
@@ -110,32 +111,36 @@ function orderParagraphsAndTables(doc, section) {
   return result.sort((a, b) => a.order - b.order);
 }
 
-function addParagraphsAndTables(orderedItems) {
+async function addParagraphsAndTables(orderedItems) {
   let result = "";
   for (const item of orderedItems) {
     if (item.elementType === "paragraph") {
-      result += addParagraph(item);
+      result += await addParagraph(item);
     } else {
-      result += addTable(item);
+      result += await addTable(item);
     }
   }
   return result;
 }
 
 async function docToJournal(doc) {
-  if (QuickInsert && !(QuickInsert.hasIndex ?? QuickInsert.searchLib?.index)) {
-    if (!WikiImporter.indexingPromise) {
-      ui.notifications.info(
-        game.i18n.localize(`${WikiImporter.ID}.quickInstert.reindexStart`)
-      );
-      WikiImporter.indexingPromise = QuickInsert.forceIndex();
-      await WikiImporter.indexingPromise;
-      delete WikiImporter.indexingPromise;
-      ui.notifications.info(
-        game.i18n.localize(`${WikiImporter.ID}.quickInstert.reindexComplete`)
-      );
-    } else {
-      await WikiImporter.indexingPromise;
+  if (self.QuickInsert && !(QuickInsert.hasIndex ?? QuickInsert.searchLib?.index)) {
+    if (
+      game.settings.get(WikiImporter.ID, WikiImporter.SETTINGS.USE_QUICK_INSERT)
+    ) {
+      if (!WikiImporter.indexingPromise) {
+        ui.notifications.info(
+          game.i18n.localize(`${WikiImporter.ID}.quickInstert.reindexStart`)
+        );
+        WikiImporter.indexingPromise = QuickInsert.forceIndex();
+        await WikiImporter.indexingPromise;
+        delete WikiImporter.indexingPromise;
+        ui.notifications.info(
+          game.i18n.localize(`${WikiImporter.ID}.quickInstert.reindexComplete`)
+        );
+      } else {
+        await WikiImporter.indexingPromise;
+      }
     }
   }
 
@@ -150,19 +155,19 @@ async function docToJournal(doc) {
     result += "<div>";
     if (section.infoboxes().length + section.images().length > 0) {
       result += '<div style="width: 50%; float: right; margin-left: 15px;">';
-      result += addInfoBoxes(section.infoboxes());
+      result += await addInfoBoxes(section.infoboxes());
       result += await addImages(section.images());
       result += "</div>";
     }
     const orderedItems = orderParagraphsAndTables(doc, section);
-    result += addParagraphsAndTables(orderedItems);
-    result += addLists(section.lists());
+    result += await await addParagraphsAndTables(orderedItems);
+    result += await addLists(section.lists());
     result += "</div>";
   }
 
   const downloadImages = game.settings.get(
     WikiImporter.ID,
-    WikiImporter.SETTINGS.INFOBOXES
+    WikiImporter.SETTINGS.DOWNLOAD_IMAGES
   );
 
   for (const image of doc.images()) {
@@ -281,13 +286,13 @@ function getImageString(image, path) {
   return result;
 }
 
-function addInfoBoxes(infoBoxes) {
+async function addInfoBoxes(infoBoxes) {
   let result = "";
   for (const infoBox of infoBoxes) {
     let infoBoxText = '<table border="1"><tbody>';
     for (const key of Object.keys(infoBox.data)) {
       if (!ignoredInfoBoxFields.includes(key)) {
-        infoBoxText += `<tr><td style="width: 30%;">${key}</td><td>${addSentence(
+        infoBoxText += `<tr><td style="width: 30%;">${key}</td><td>${await addSentence(
           infoBox.data[key]
         )}</td></tr>`;
       }
@@ -298,7 +303,7 @@ function addInfoBoxes(infoBoxes) {
   return result;
 }
 
-function addTable(table) {
+async function addTable(table) {
   if (table.data.length > 0) {
     let tableText = '<table border="1"><thead><tr>';
     for (const key of Object.keys(table.data[0])) {
@@ -308,7 +313,7 @@ function addTable(table) {
     for (const row of table.data) {
       tableText += "<tr>";
       for (const cell of Object.values(row)) {
-        tableText += `<td>${addSentence(cell)}</td>`;
+        tableText += `<td>${await addSentence(cell)}</td>`;
       }
       tableText += "</tr>";
     }
@@ -319,13 +324,13 @@ function addTable(table) {
   }
 }
 
-function addLists(lists) {
+async function addLists(lists) {
   let result = "";
   for (const list of lists) {
     if (list.data.length > 0) {
       let listText = "<ul>";
       for (const sentence of list.data) {
-        listText += `<li>${addSentence(sentence)}</li>`;
+        listText += `<li>${await addSentence(sentence)}</li>`;
       }
       result += `${listText}</ul>`;
     }
@@ -333,10 +338,10 @@ function addLists(lists) {
   return result;
 }
 
-function addParagraph(paragraph) {
+async function addParagraph(paragraph) {
   let paragraphText = "";
   for (const sentence of paragraph.sentences()) {
-    paragraphText += addSentence(sentence);
+    paragraphText += await addSentence(sentence);
   }
   if (paragraphText.length > 0) {
     return `<p>${paragraphText}</p>`;
@@ -345,7 +350,7 @@ function addParagraph(paragraph) {
   }
 }
 
-function addSentence(sentence) {
+async function addSentence(sentence) {
   let sentenceText = sentence.text() + " ";
   for (const bold of sentence.bolds()) {
     sentenceText = sentenceText.replace(bold, `<b>${bold}</b>`);
@@ -353,31 +358,56 @@ function addSentence(sentence) {
   for (const italic of sentence.italics()) {
     sentenceText = sentenceText.replace(italic, `<i>${italic}</i>`);
   }
+  const linkPromises = [];
   for (const link of sentence.links()) {
-    if (link.type() === "internal") {
-      let searchResults = [];
-      if (QuickInsert && QuickInsert.search) {
-        searchResults = QuickInsert.search(link.page()).filter(
-          result => result.item.name.toLowerCase() === link.page().toLowerCase()
-        );
-      }
+    linkPromises.push(searchLink(link));
+  }
+  const linkSearches = await Promise.all(linkPromises);
+  for (const linkSearch of linkSearches) {
+    sentenceText = addLink(
+      linkSearch.link,
+      linkSearch.searchResults,
+      sentenceText
+    );
+  }
+  return sentenceText;
+}
 
-      sentenceText = sentenceText.replace(
-        link.text() ? link.text() : link.page(),
-        getLink(
-          link.page(),
-          searchResults,
-          link.text() ? link.text() : link.page()
-        )
-      );
-    } else if (link.type() === "external") {
-      sentenceText = sentenceText.replace(
-        link.text(),
-        `<a href="${link.site()}">${link.text()}</a>`
+async function searchLink(link) {
+  let searchResults = [];
+
+  if (self.QuickInsert && QuickInsert.search) {
+    if (
+      game.settings.get(WikiImporter.ID, WikiImporter.SETTINGS.USE_QUICK_INSERT)
+    ) {
+      searchResults = QuickInsert.search(link.page(), null, 10).filter(
+        result => result.item.name.toLowerCase() === link.page().toLowerCase()
       );
     }
   }
-  return sentenceText;
+
+  return {
+    searchResults,
+    link
+  };
+}
+
+function addLink(link, searchResults, sentenceText) {
+  if (link.type() === "internal") {
+    return sentenceText.replace(
+      link.text() ? link.text() : link.page(),
+      getLink(
+        link.page(),
+        searchResults,
+        link.text() ? link.text() : link.page()
+      )
+    );
+  } else if (link.type() === "external") {
+    return sentenceText.replace(
+      link.text(),
+      `<a href="${link.site()}">${link.text()}</a>`
+    );
+  }
 }
 
 function getLink(linkPage, searchResults, linkText) {

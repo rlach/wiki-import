@@ -14,8 +14,10 @@
     "wiki-import.progress.startFetch": "Downloading wikipedia page...",
     "wiki-import.progress.startConvert": "Importing wikipedia page...",
     "wiki-import.progress.complete": "Wiki page imported!",
-    "wiki-import.quickInstert.reindexStart`": "Indexing compendia...",
-    "wiki-import.quickInstert.reindexComplete`": "Indexed compendia.",
+    "wiki-import.quickInstert.reindexStart": "Indexing compendia...",
+    "wiki-import.quickInstert.reindexComplete": "Indexed compendia.",
     "wiki-import.settings.downloadImages.name": "Download images",
-    "wiki-import.settings.downloadImages.hint": "If set to true will attempt to download images to local directory. Will fallback to regular behavior if behind CORS or any other issue happens."
+    "wiki-import.settings.downloadImages.hint": "If set to true will attempt to download images to local directory. Will fallback to regular behavior if behind CORS or any other issue happens.",
+    "wiki-import.settings.useQuickInsert.name": "Use quick-insert",
+    "wiki-import.settings.useQuickInsert.hint": "If set to true it will try to find matching links in compendia using quick-insert search. This can be slow due to amount of links checked."
 }
