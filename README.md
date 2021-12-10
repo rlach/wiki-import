@@ -99,6 +99,9 @@ References are not imported(those pesky numbers in square brackets that refer to
 
 ## Changelog
 
+### 0.9.3
+* Fixed conflict with GM notes
+
 ### 0.9.2
 * Improved memorization of last domain used.
 * Fixed a bug with links when the same link text is used multiple times in single sentence.

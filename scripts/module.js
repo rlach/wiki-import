@@ -75,7 +75,7 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
     );
 
     let openBtn = $(
-      `<a class="open-gm-note" title="${title}"><i class="fas fa-file-import"></i>${label}</a>`
+      `<a class="open-wiki-import" title="${title}"><i class="fas fa-file-import"></i>${label}</a>`
     );
     openBtn.click(ev => {
       new Dialog({
@@ -139,7 +139,7 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
     });
     html
       .closest(".app")
-      .find(".open-gm-note")
+      .find(".open-wiki-import")
       .remove();
     let titleElement = html.closest(".app").find(".window-title");
     openBtn.insertAfter(titleElement);
