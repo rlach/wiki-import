@@ -15,16 +15,29 @@ Hooks.once("init", async () => {
   });
 
   game.settings.register(
-    WikiImporter.ID,
-    WikiImporter.SETTINGS.DOWNLOAD_IMAGES,
-    {
-      name: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.DOWNLOAD_IMAGES}.name`,
-      default: false,
-      type: Boolean,
-      scope: "client",
-      config: true,
-      hint: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.DOWNLOAD_IMAGES}.hint`
-    }
+      WikiImporter.ID,
+      WikiImporter.SETTINGS.DOWNLOAD_IMAGES,
+      {
+        name: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.DOWNLOAD_IMAGES}.name`,
+        default: false,
+        type: Boolean,
+        scope: "client",
+        config: true,
+        hint: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.DOWNLOAD_IMAGES}.hint`
+      }
+  );
+
+  game.settings.register(
+      WikiImporter.ID,
+      WikiImporter.SETTINGS.AUTO_CAPITALIZE_LINKS,
+      {
+        name: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.AUTO_CAPITALIZE_LINKS}.name`,
+        default: false,
+        type: Boolean,
+        scope: "client",
+        config: true,
+        hint: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.AUTO_CAPITALIZE_LINKS}.hint`
+      }
   );
 
   game.settings.register(
@@ -72,23 +85,32 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
         game.user.getFlag(WikiImporter.ID, WikiImporter.FLAGS.DOMAIN) || "";
     WikiImporter.log(false, 'previous domain', previousDomain);
     let downloadFromUrlLabel = game.i18n.localize(
-      `${WikiImporter.ID}.dialog.downloadFromUrl`
+        `${WikiImporter.ID}.dialog.downloadFromUrl`
     );
     let wikiArticleUrlLabel = game.i18n.localize(
-      `${WikiImporter.ID}.dialog.wikiArticleUrl`
+        `${WikiImporter.ID}.dialog.wikiArticleUrl`
     );
     let pasteTheSourceLabel = game.i18n.localize(
-      `${WikiImporter.ID}.dialog.pasteSource`
+        `${WikiImporter.ID}.dialog.pasteSource`
+    );
+    let authenticationNote = game.i18n.localize(
+          `${WikiImporter.ID}.dialog.authenticationNote`
+    );
+    let corsNote = game.i18n.localize(
+          `${WikiImporter.ID}.dialog.corsNote`
+    );
+    let moreOnCors = game.i18n.localize(
+          `${WikiImporter.ID}.dialog.moreOnCors`
     );
     let wikiSourceLabel = game.i18n.localize(
-      `${WikiImporter.ID}.dialog.wikiSource`
+        `${WikiImporter.ID}.dialog.wikiSource`
     );
     let wikiDomainLabel = game.i18n.localize(
-      `${WikiImporter.ID}.dialog.wikiDomain`
+        `${WikiImporter.ID}.dialog.wikiDomain`
     );
 
     let openBtn = $(
-      `<a class="open-wiki-import" title="${title}"><i class="fas fa-file-import"></i>${label}</a>`
+        `<a class="open-wiki-import" title="${title}"><i class="fas fa-file-import"></i>${label}</a>`
     );
     openBtn.click(ev => {
       new Dialog({
@@ -97,11 +119,13 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
     <form>
     
     <p>${downloadFromUrlLabel}</p>
+      <p class="warning-note">${authenticationNote}</p>
       <div class="form-group">
         <label>${wikiArticleUrlLabel}</label>
         <input type='text' name='articleUrl'></input>
       </div>
       <p>${pasteTheSourceLabel}</p>
+      <p class="warning-note">${corsNote} <a target="_blank" href="https://github.com/rlach/wiki-import/wiki/About-CORS">${moreOnCors}</a></p>
       <div class="form-group">
          <label>${wikiSourceLabel}</label>
          <textarea id="wikiSource" name="wikiSource" rows="4" cols="50"></textarea>
@@ -151,9 +175,9 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
       }).render(true);
     });
     html
-      .closest(".app")
-      .find(".open-wiki-import")
-      .remove();
+        .closest(".app")
+        .find(".open-wiki-import")
+        .remove();
     let titleElement = html.closest(".app").find(".window-title");
     openBtn.insertAfter(titleElement);
   }
