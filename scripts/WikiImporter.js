@@ -33,6 +33,7 @@ export class WikiImporter {
     );
     addCustomInfoBoxes();
     const doc = await wtf.fetch(url);
+    WikiImporter.log(false, `Downloaded document`, doc);
     return docToJournal(doc);
   }
 
