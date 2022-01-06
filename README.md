@@ -24,12 +24,14 @@ Click it, and you'll see dialog window with import settings.
 
 There are two ways to import the content:
 
-* Enter the full url of the page you want to import (including https)
+### Direct wiki import
+Enter the full url of the page you want to import (including https)
   - If url is filled in all other fields are ignored.
   
 https://user-images.githubusercontent.com/5655000/127136277-03fee9c7-ef03-480f-a31b-3a03d8815d16.mov
-  
-* Enter the page source and optionally domain name to import the page
+
+### Wiki source import
+Enter the page source and optionally domain name to import the page
   - The domain name should NOT include https, so it should be formatted, for example `wikipedia.org`.
   - The domain name will be remembered between imports.
   - The source should be in wikipedia syntax. To find it click "edit source" or "view source" button on the wikipedia article.
