@@ -27,6 +27,19 @@ Hooks.once("init", async () => {
     }
   );
 
+  game.settings.register(
+      WikiImporter.ID,
+      WikiImporter.SETTINGS.AUTO_CAPITALIZE_LINKS,
+      {
+        name: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.AUTO_CAPITALIZE_LINKS}.name`,
+        default: false,
+        type: Boolean,
+        scope: "client",
+        config: true,
+        hint: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.AUTO_CAPITALIZE_LINKS}.hint`
+      }
+  );
+
   if(QuickInsert) {
     game.settings.register(
         WikiImporter.ID,

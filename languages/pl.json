@@ -19,5 +19,7 @@
     "wiki-import.settings.downloadImages.name": "Pobieraj obrazy",
     "wiki-import.settings.downloadImages.hint": "Po włączeniu obrazy będą pobierane do lokalnego folderu. W wypadku porażki, np. z powodu CORSów, zachowa się jakby ta opcja była wyłączona.",
     "wiki-import.settings.useQuickInsert.name": "Używaj quick-insert",
-    "wiki-import.settings.useQuickInsert.hint": "Po włączeniu wyszukiwarka quick-insert będzie wykorzystywana by linkować importowane wpisy do kompendiów. Z powodu dużej ilości sprawdzanych linków bywa to dość powolne."
+    "wiki-import.settings.useQuickInsert.hint": "Po włączeniu wyszukiwarka quick-insert będzie wykorzystywana by linkować importowane wpisy do kompendiów. Z powodu dużej ilości sprawdzanych linków bywa to dość powolne.",
+    "wiki-import.settings.autoCapitalizeLinks.name": "Linki z dużej litery",
+    "wiki-import.settings.autoCapitalizeLinks.hint": "Wszystkie wewnętrzne linki będą używać dużej litery na początku. Wyświetlany tekst linku nie zostanie zmieniony. Przykładowo: @JournalEntry[EBay]{eBay} zamiast @JournalEntry[eBay]{eBay}."
 }

@@ -19,5 +19,7 @@
     "wiki-import.settings.downloadImages.name": "Download images",
     "wiki-import.settings.downloadImages.hint": "If set to true will attempt to download images to local directory. Will fallback to regular behavior if behind CORS or any other issue happens.",
     "wiki-import.settings.useQuickInsert.name": "Use quick-insert",
-    "wiki-import.settings.useQuickInsert.hint": "If set to true it will try to find matching links in compendia using quick-insert search. This can be slow due to amount of links checked."
+    "wiki-import.settings.useQuickInsert.hint": "If set to true it will try to find matching links in compendia using quick-insert search. This can be slow due to amount of links checked.",
+    "wiki-import.settings.autoCapitalizeLinks.name": "Automatically capitalize links",
+    "wiki-import.settings.autoCapitalizeLinks.hint": "First letter of each local link will be capitalized. This will not change displayed text for the link. Sample result: @JournalEntry[EBay]{eBay} instead of @JournalEntry[eBay]{eBay}."
 }

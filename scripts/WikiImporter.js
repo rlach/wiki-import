@@ -21,7 +21,8 @@ export class WikiImporter {
   static SETTINGS = {
     INFOBOXES: "infoboxes",
     DOWNLOAD_IMAGES: "downloadImages",
-    USE_QUICK_INSERT: "useQuickInsert"
+    USE_QUICK_INSERT: "useQuickInsert",
+    AUTO_CAPITALIZE_LINKS: "autoCapitalizeLinks"
   };
 
   static indexingPromise = null;
@@ -433,7 +434,12 @@ function getLink(linkPage, searchResults, linkText) {
     }
   }
 
-  return `@JournalEntry[${linkPage}]{${linkText}}`;
+  const linkPageUpdated = game.settings.get(WikiImporter.ID, WikiImporter.SETTINGS.AUTO_CAPITALIZE_LINKS) ? capitalizeFirstLetter(linkPage) : linkPage;
+  return `@JournalEntry[${linkPageUpdated}]{${linkText}}`;
+}
+
+function capitalizeFirstLetter(text) {
+  return text.length > 0 ? text.charAt(0).toUpperCase() + text.slice(1) : text;
 }
 
 function header(title, depth) {
