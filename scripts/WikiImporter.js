@@ -378,7 +378,7 @@ async function addSentence(sentence) {
 async function searchLink(link) {
   let searchResults = [];
 
-  if (link.type() === "internal" && self.QuickInsert && QuickInsert.search) {
+  if ((link.type() === "internal" || link.type() === "interwiki") && self.QuickInsert && QuickInsert.search) {
     if (
         game.settings.get(WikiImporter.ID, WikiImporter.SETTINGS.USE_QUICK_INSERT)
     ) {
@@ -399,7 +399,7 @@ function escapeRegExp(text) {
 }
 
 function addLink(link, searchResults, sentenceText) {
-  if (link.type() === "internal") {
+  if (link.type() === "internal" || link.type() === "interwiki") {
     const linkText = link.text() ? link.text() : link.page();
     return sentenceText.replace(
         new RegExp(escapeRegExp(linkText) + '(?![^{]*})'),
@@ -415,6 +415,8 @@ function addLink(link, searchResults, sentenceText) {
         `<a href="${link.site()}">${link.text()}</a>`
     );
   }
+  WikiImporter.log(false, 'Unknown link type', link);
+  return sentenceText;
 }
 
 function getLink(linkPage, searchResults, linkText) {
