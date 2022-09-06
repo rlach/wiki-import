@@ -1,4 +1,4 @@
-import { WikiImporter } from "./WikiImporter.js";
+import { WikiImporter } from "./WikiImporter.js"
 
 Hooks.once("init", async () => {
   if ((await FilePicker.browse("data", "wiki-import").target) === "") {
@@ -12,6 +12,24 @@ Hooks.once("init", async () => {
     scope: "client",
     config: true,
     hint: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.INFOBOXES}.hint`
+  });
+
+  game.settings.register(WikiImporter.ID, WikiImporter.SETTINGS.LINK_REPLACER_INPUT, {
+    name: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.LINK_REPLACER_INPUT}.name`,
+    default: "",
+    type: String,
+    scope: "client",
+    config: true,
+    hint: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.LINK_REPLACER_INPUT}.hint`
+  });
+
+  game.settings.register(WikiImporter.ID, WikiImporter.SETTINGS.LINK_REPLACER_OUTPUT, {
+    name: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.LINK_REPLACER_OUTPUT}.name`,
+    default: "",
+    type: String,
+    scope: "client",
+    config: true,
+    hint: `${WikiImporter.ID}.settings.${WikiImporter.SETTINGS.LINK_REPLACER_OUTPUT}.hint`
   });
 
   game.settings.register(
@@ -105,6 +123,9 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
     let wikiSourceLabel = game.i18n.localize(
         `${WikiImporter.ID}.dialog.wikiSource`
     );
+    let wikiTitleLabel = game.i18n.localize(
+        `${WikiImporter.ID}.dialog.wikiTitle`
+    );
     let wikiDomainLabel = game.i18n.localize(
         `${WikiImporter.ID}.dialog.wikiDomain`
     );
@@ -118,6 +139,10 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
         content: `
     <form>
     
+    <div class="form-group">
+         <label>${wikiTitleLabel}</label>
+         <input type='text' name='wikiTitle'></input>
+    </div>
     <p>${downloadFromUrlLabel}</p>
       <p class="warning-note">${authenticationNote}</p>
       <div class="form-group">
@@ -130,7 +155,7 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
          <label>${wikiSourceLabel}</label>
          <textarea id="wikiSource" name="wikiSource" rows="4" cols="50"></textarea>
       </div>
-            <div class="form-group">
+      <div class="form-group">
         <label>${wikiDomainLabel}</label>
         <input type='text' name='wikiDomain' value="${previousDomain}"></input>
       </div>
@@ -142,6 +167,7 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
             callback: async html => {
               let articleUrl = html.find("input[name='articleUrl']").val();
               let wikiSource = html.find("textarea[name='wikiSource']").val();
+              let wikiTitle = html.find("input[name='wikiTitle']").val();
               let domain = html.find("input[name='wikiDomain']").val();
               WikiImporter.log(false, 'found domain', domain);
 
@@ -165,8 +191,18 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
                   );
                 }
 
-                console.log('wiki-test', 'update-content');
-                app.document.update({ content });
+                await JournalEntryPage.create([{
+                  name: getTitle(wikiTitle, articleUrl),
+                  type: 'text',
+                  text: {
+                      content,
+                  },
+                  title: {
+                      show: true,
+                      level: 1
+                  }
+                }], {parent: app.document});
+
               })
             }
           }
@@ -182,3 +218,15 @@ Hooks.on("renderJournalSheet", (app, html, data) => {
     openBtn.insertAfter(titleElement);
   }
 });
+
+function getTitle(wikiTitle, wikiUrl) {
+    if(wikiTitle?.length > 0) {
+        return wikiTitle;
+    }
+
+    if(wikiUrl?.length <= 0) {
+        return 'Wikipedia import';
+    } else {
+        return wikiUrl.split('/').pop()?.replaceAll('_', ' ') || 'Wikipedia import';
+    }
+}
