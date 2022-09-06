@@ -101,6 +101,11 @@ References are not imported(those pesky numbers in square brackets that refer to
 
 ## Changelog
 
+### 0.10.0
+* Changed compatibility to Foundry v10
+* Added link replacer
+* Added custom title field. Now the article is imported as a new page, and can be automatically titled.
+
 ### 0.9.3
 * Fixed conflict with GM notes
 

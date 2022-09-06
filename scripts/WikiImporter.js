@@ -19,6 +19,8 @@ export class WikiImporter {
   };
 
   static SETTINGS = {
+    LINK_REPLACER_INPUT: 'linkReplacerInput',
+    LINK_REPLACER_OUTPUT: 'linkReplacerOutput',
     INFOBOXES: "infoboxes",
     DOWNLOAD_IMAGES: "downloadImages",
     USE_QUICK_INSERT: "useQuickInsert",
@@ -382,8 +384,10 @@ async function searchLink(link) {
     if (
         game.settings.get(WikiImporter.ID, WikiImporter.SETTINGS.USE_QUICK_INSERT)
     ) {
-      searchResults = QuickInsert.search(link.page(), null, 10).filter(
-          result => result.item.name.toLowerCase() === link.page().toLowerCase()
+      const linkText = getReplacedLink(link.page());
+
+      searchResults = QuickInsert.search(linkText, null, 10).filter(
+          result => result.item.name.toLowerCase() === linkText.toLowerCase()
       );
     }
   }
@@ -394,17 +398,35 @@ async function searchLink(link) {
   };
 }
 
+function getReplacedLink(linkText) {
+  let replacerInput = game.settings.get(
+      WikiImporter.ID,
+      WikiImporter.SETTINGS.LINK_REPLACER_INPUT
+  );
+
+  let replacerOutput = game.settings.get(
+      WikiImporter.ID,
+      WikiImporter.SETTINGS.LINK_REPLACER_OUTPUT
+  );
+
+  if(replacerInput?.length > 0) {
+    return linkText?.replace(replacerInput, replacerOutput || '');
+  } else {
+    return linkText;
+  }
+}
+
 function escapeRegExp(text) {
   return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 }
 
 function addLink(link, searchResults, sentenceText) {
   if (link.type() === "internal" || link.type() === "interwiki") {
-    const linkText = link.text() ? link.text() : link.page();
+    const linkText = link.text() ? link.text() : getReplacedLink(link.page());
     return sentenceText.replace(
         new RegExp(escapeRegExp(linkText) + '(?![^{]*})'),
         getLink(
-            link.page(),
+            getReplacedLink(link.page()),
             searchResults,
             linkText
         )
