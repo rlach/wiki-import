@@ -36,7 +36,11 @@ export class WikiImporter {
     addCustomInfoBoxes();
     const doc = await wtf.fetch(url);
     WikiImporter.log(false, `Downloaded document`, doc);
-    return docToJournal(doc);
+    if(doc){
+      return docToJournal(doc);
+    } else {
+      return undefined;
+    }
   }
 
   static async convertSource(source, domain) {

@@ -1,6 +1,9 @@
 import { WikiImporter } from "./WikiImporter.js"
 
 Hooks.once("init", async () => {
+  // Expose WikiImporter globally
+  game.WikiImporter = WikiImporter;
+
   if ((await FilePicker.browse("data", "wiki-import").target) === "") {
     await FilePicker.createDirectory("data", "wiki-import");
   }
