@@ -1,3 +1,7 @@
+# Not maintained anymore
+
+This project is not maintained anymore. Feel free to fork, fix and publish it on foundry marketplace.
+
 ![](https://img.shields.io/badge/Foundry-v0.8.6-informational)
 <!--- Downloads @ Latest Badge -->
 <!--- replace <user>/<repo> with your username/repository -->
